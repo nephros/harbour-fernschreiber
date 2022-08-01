@@ -1,11 +1,11 @@
 name: Fernschreiber build
 
-on:
-  push:
-    branches:
-      - master
-    tags:
-      - '*'
+on: workflow_dispatch
+  #push:
+  #  branches:
+  #    - master
+  #  tags:
+  #    - '*'
   # to prevent secrets leaking,
   # we don't build on PRs
   #pull_request:
