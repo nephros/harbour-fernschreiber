@@ -384,7 +384,7 @@ ChatListModel::ChatListModel(TDLibWrapper *tdLibWrapper, AppSettings *appSetting
     connect(tdLibWrapper, SIGNAL(newChatDiscovered(QString, QVariantMap)), this, SLOT(handleChatDiscovered(QString, QVariantMap)));
     connect(tdLibWrapper, SIGNAL(chatLastMessageUpdated(QString, QString, QVariantMap)), this, SLOT(handleChatLastMessageUpdated(QString, QString, QVariantMap)));
     connect(tdLibWrapper, SIGNAL(chatOrderUpdated(QString, QString)), this, SLOT(handleChatOrderUpdated(QString, QString)));
-    connect(tdLibWrapper, SIGNAL(chatReadInboxUpdated(QString, QString, int)), this, SLOT(handleChatReadInboxUpdated(QString, QString, int)));
+    connect(tdLibWrapper, SIGNAL(chatReadInboxUpdated(QString, QString, int, int)), this, SLOT(handleChatReadInboxUpdated(QString, QString, int, int)));
     connect(tdLibWrapper, SIGNAL(chatReadOutboxUpdated(QString, QString)), this, SLOT(handleChatReadOutboxUpdated(QString, QString)));
     connect(tdLibWrapper, SIGNAL(chatPhotoUpdated(qlonglong, QVariantMap)), this, SLOT(handleChatPhotoUpdated(qlonglong, QVariantMap)));
     connect(tdLibWrapper, SIGNAL(chatPinnedMessageUpdated(qlonglong, qlonglong)), this, SLOT(handleChatPinnedMessageUpdated(qlonglong, qlonglong)));
@@ -774,14 +774,14 @@ void ChatListModel::handleChatOrderUpdated(const QString &id, const QString &ord
     }
 }
 
-void ChatListModel::handleChatReadInboxUpdated(const QString &id, const QString &lastReadInboxMessageId, int unreadCount)
+void ChatListModel::handleChatReadInboxUpdated(const QString &id, const QString &lastReadInboxMessageId, int unreadCount, int unreadUnmutedCount)
 {
     bool ok;
     const qlonglong chatId = id.toLongLong(&ok);
     if (ok) {
         const qlonglong messageId = lastReadInboxMessageId.toLongLong();
         if (chatIndexMap.contains(chatId)) {
-            LOG("Updating chat unread count for" << chatId << "unread messages" << unreadCount << ", last read message ID: " << lastReadInboxMessageId);
+            LOG("Updating chat unread count for" << chatId << "unread messages" << unreadCount << " (" << unreadUnmutedCount << ")" << ", last read message ID: " << lastReadInboxMessageId);
             const int chatIndex = chatIndexMap.value(chatId);
             ChatData *chat = chatList.at(chatIndex);
             QVector<int> changedRoles;
