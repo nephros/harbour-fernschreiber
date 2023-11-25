@@ -269,7 +269,7 @@ ChatModel::ChatModel(TDLibWrapper *tdLibWrapper) :
     connect(this->tdLibWrapper, SIGNAL(sponsoredMessageReceived(qlonglong, QVariantMap)), this, SLOT(handleSponsoredMessageReceived(qlonglong, QVariantMap)));
     connect(this->tdLibWrapper, SIGNAL(newMessageReceived(qlonglong, QVariantMap)), this, SLOT(handleNewMessageReceived(qlonglong, QVariantMap)));
     connect(this->tdLibWrapper, SIGNAL(receivedMessage(qlonglong, qlonglong, QVariantMap)), this, SLOT(handleMessageReceived(qlonglong, qlonglong, QVariantMap)));
-    connect(this->tdLibWrapper, SIGNAL(chatReadInboxUpdated(QString, QString, int)), this, SLOT(handleChatReadInboxUpdated(QString, QString, int)));
+    connect(this->tdLibWrapper, SIGNAL(chatReadInboxUpdated(QString, QString, int, int)), this, SLOT(handleChatReadInboxUpdated(QString, QString, int, int)));
     connect(this->tdLibWrapper, SIGNAL(chatReadOutboxUpdated(QString, QString)), this, SLOT(handleChatReadOutboxUpdated(QString, QString)));
     connect(this->tdLibWrapper, SIGNAL(messageSendSucceeded(qlonglong, qlonglong, QVariantMap)), this, SLOT(handleMessageSendSucceeded(qlonglong, qlonglong, QVariantMap)));
     connect(this->tdLibWrapper, SIGNAL(chatNotificationSettingsUpdated(QString, QVariantMap)), this, SLOT(handleChatNotificationSettingsUpdated(QString, QVariantMap)));
@@ -539,11 +539,12 @@ void ChatModel::handleMessageReceived(qlonglong chatId, qlonglong messageId, con
     }
 }
 
-void ChatModel::handleChatReadInboxUpdated(const QString &id, const QString &lastReadInboxMessageId, int unreadCount)
+void ChatModel::handleChatReadInboxUpdated(const QString &id, const QString &lastReadInboxMessageId, int unreadCount, int unreadUnmutedCount)
 {
     if (id.toLongLong() == chatId) {
         LOG("Updating chat unread count, unread messages" << unreadCount << ", last read message ID:" << lastReadInboxMessageId);
         this->chatInformation.insert("unread_count", unreadCount);
+        this->chatInformation.insert("unread_unmuted_count", unreadUnmutedCount);
         this->chatInformation.insert(LAST_READ_INBOX_MESSAGE_ID, lastReadInboxMessageId);
         emit unreadCountUpdated(unreadCount, lastReadInboxMessageId);
     }
