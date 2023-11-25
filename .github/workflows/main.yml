@@ -15,6 +15,7 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: "FS API"
 
     steps:
     - uses: actions/checkout@v2
