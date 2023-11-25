@@ -68,6 +68,7 @@ public:
     const QVariant lastMessage(const QString &key) const;
     QString title() const;
     int unreadCount() const;
+    int unreadUnmutedCount() const;
     int unreadMentionCount() const;
     int unreadReactionCount() const;
     QVariant photoSmall() const;
@@ -786,8 +787,14 @@ void ChatListModel::handleChatReadInboxUpdated(const QString &id, const QString 
             ChatData *chat = chatList.at(chatIndex);
             QVector<int> changedRoles;
             changedRoles.append(ChatListModel::RoleDisplay);
-            if (chat->updateUnreadCount(unreadCount)) {
-                changedRoles.append(ChatListModel::RoleUnreadCount);
+            if (this->appSettings->showMutedUnread()) {
+                if (chat->updateUnreadCount(unreadCount)) {
+                    changedRoles.append(ChatListModel::RoleUnreadCount);
+                }
+            } else {
+                if (chat->updateUnreadCount(unreadUnmutedCount)) {
+                    changedRoles.append(ChatListModel::RoleUnreadCount);
+                }
             }
             if (chat->updateLastReadInboxMessageId(messageId)) {
                 changedRoles.append(ChatListModel::RoleLastReadInboxMessageId);
@@ -799,7 +806,11 @@ void ChatListModel::handleChatReadInboxUpdated(const QString &id, const QString 
             ChatData *chat = hiddenChats.value(chatId);
             if (chat) {
                 LOG("Updating unread count for hidden chat" << chatId << "unread messages" << unreadCount << ", last read message ID: " << lastReadInboxMessageId);
-                chat->updateUnreadCount(unreadCount);
+                if (this->appSettings->showMutedUnread()) {
+                    chat->updateUnreadCount(unreadCount);
+                } else {
+                    chat->updateUnreadCount(unreadUnmutedCount);
+                }
                 chat->updateLastReadInboxMessageId(messageId);
             }
         }
