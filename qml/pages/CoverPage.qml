@@ -27,6 +27,7 @@ CoverBackground {
     id: coverPage
 
     property int unreadMessages: 0
+    property int totalMessages: 0
     property int unreadChats: 0
     readonly property bool authenticated: tdLibWrapper.authorizationState === TelegramAPI.AuthorizationReady
     property int connectionState: TelegramAPI.WaitingForNetwork
@@ -35,6 +36,7 @@ CoverBackground {
 
         unreadMessagesText.text = qsTr("unread messages", "", coverPage.unreadMessages);
         unreadChatsText.text = qsTr("chats", "", coverPage.unreadChats)
+        mutedMessagesText.text = qsTr("muted messages", "", coverPage.totalMessages - coverPage.unreadMessages);
 
         switch (coverPage.connectionState) {
         case TelegramAPI.WaitingForNetwork:
@@ -61,7 +63,9 @@ CoverBackground {
             coverPage.unreadMessages = tdLibWrapper.getUnreadMessageInformation().unread_count || 0;
             coverPage.unreadChats = tdLibWrapper.getUnreadChatInformation().unread_count || 0;
         } else {
-            coverPage.unreadMessages = tdLibWrapper.getUnreadMessageInformation().unread_unmuted_count || 0;
+            var msgs = tdLibWrapper.getUnreadMessageInformation()
+            coverPage.unreadMessages = msgs.unread_unmuted_count || 0;
+            coverPage.totalMessages = msgs.unread_count || 0;
             coverPage.unreadChats = tdLibWrapper.getUnreadChatInformation().unread_unmuted_count || 0;
         }
         setUnreadInfoText();
