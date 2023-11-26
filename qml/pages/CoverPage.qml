@@ -27,6 +27,7 @@ CoverBackground {
     id: coverPage
 
     property int unreadMessages: 0
+    property int mutedMessages: 0
     property int unreadChats: 0
     readonly property bool authenticated: tdLibWrapper.authorizationState === TelegramAPI.AuthorizationReady
     property int connectionState: TelegramAPI.WaitingForNetwork
@@ -35,6 +36,7 @@ CoverBackground {
 
         unreadMessagesText.text = qsTr("unread messages", "", coverPage.unreadMessages);
         unreadChatsText.text = qsTr("chats", "", coverPage.unreadChats)
+        mutedMessagesText.text = qsTr("messages muted", "", coverPage.mutedMessages);
 
         switch (coverPage.connectionState) {
         case TelegramAPI.WaitingForNetwork:
@@ -61,7 +63,9 @@ CoverBackground {
             coverPage.unreadMessages = tdLibWrapper.getUnreadMessageInformation().unread_count || 0;
             coverPage.unreadChats = tdLibWrapper.getUnreadChatInformation().unread_count || 0;
         } else {
-            coverPage.unreadMessages = tdLibWrapper.getUnreadMessageInformation().unread_unmuted_count || 0;
+            var msgs = tdLibWrapper.getUnreadMessageInformation()
+            coverPage.unreadMessages = msgs.unread_unmuted_count || 0;
+            coverPage.mutedMessages = msgs.unread_count - msgs.unread_unmuted_count
             coverPage.unreadChats = tdLibWrapper.getUnreadChatInformation().unread_unmuted_count || 0;
         }
         setUnreadInfoText();
@@ -70,11 +74,12 @@ CoverBackground {
     Connections {
         target: tdLibWrapper
         onUnreadMessageCountUpdated: {
-            coverPage.unreadMessages = messageCountInformation.unread_count;
+            coverPage.unreadMessages = appSettings.showMutedUnread ? messageCountInformation.unread_count : messageCountInformation.unread_unmuted_count;
+            coverPage.mutedMessages  = appSettings.showMutedUnread ? (messageCountInformation.unread_count - messageCountInformation.unread_unmuted_count) : 0
             setUnreadInfoText();
         }
         onUnreadChatCountUpdated: {
-            coverPage.unreadChats = chatCountInformation.unread_count;
+            coverPage.unreadChats = appSettings.showMutedUnread ? chatCountInformation.unread_count : chatCountInformation.unread_umnuted_count;
             setUnreadInfoText();
         }
         onAuthorizationStateChanged: {
@@ -86,6 +91,7 @@ CoverBackground {
         }
     }
 
+    /*
     Connections {
         target: chatListModel
         onUnreadStateChanged: {
@@ -94,6 +100,7 @@ CoverBackground {
             setUnreadInfoText();
         }
     }
+    */
 
     BackgroundImage {
         id: backgroundImage
@@ -111,8 +118,10 @@ CoverBackground {
     }
 
     Column {
-        anchors.fill: parent
-        anchors.margins: Theme.paddingLarge
+        anchors.top: parent.top
+        x: Theme.paddingLarge
+        topPadding: Theme.paddingLarge
+        width: parent.width - Theme.paddingLarge
         spacing: Theme.paddingMedium
         visible: coverPage.authenticated
         Row {
@@ -161,16 +170,45 @@ CoverBackground {
                 anchors.verticalCenter: unreadChatsCountText.verticalCenter
             }
         }
-
-        Text {
-            id: connectionStateText
-            font.pixelSize: Theme.fontSizeLarge
-            color: Theme.highlightColor
-            visible: coverPage.authenticated
-            width: parent.width
-            maximumLineCount: 3
-            wrapMode: Text.Wrap
-        }
     }
 
+    Text {
+        id: connectionStateText
+        anchors.centerIn: parent
+        font.pixelSize: Theme.fontSizeLarge
+        color: Theme.highlightColor
+        visible: coverPage.authenticated
+        maximumLineCount: 3
+        wrapMode: Text.Wrap
+    }
+
+    Column {
+        anchors.bottom: parent.bottom
+        x: Theme.paddingLarge
+        bottomPadding: Theme.paddingLarge
+        width: parent.width - Theme.paddingLarge
+        spacing: Theme.paddingMedium
+        visible: coverPage.authenticated
+        Row {
+            width: parent.width
+            spacing: Theme.paddingMedium
+            visible: !appSettings.showMutedUnread
+            Text {
+                id: mutedMessagesCountText
+                font.pixelSize: (coverPage.mutedMessages > 99) ? Theme.fontSizeLarge : Theme.fontSizeExtraLarge
+                color: Theme.secondaryColor
+                text: Functions.getShortenedCount(coverPage.mutedMessages)
+            }
+            Label {
+                id: mutedMessagesText
+                font.pixelSize: Theme.fontSizeExtraSmall
+                width: parent.width - mutedMessagesCountText.width - Theme.paddingMedium
+                wrapMode: Text.Wrap
+                anchors.verticalCenter: mutedMessagesCountText.verticalCenter
+                maximumLineCount: 2
+                truncationMode: TruncationMode.Fade
+                color: Theme.secondaryColor
+            }
+        }
+    }
 }
