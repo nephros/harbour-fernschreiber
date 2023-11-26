@@ -115,8 +115,10 @@ CoverBackground {
     }
 
     Column {
-        anchors.fill: parent
-        anchors.margins: Theme.paddingLarge
+        anchors.top: parent.top
+        x: Theme.paddingLarge
+        topPadding: Theme.paddingLarge
+        width: parent.width - Theme.paddingLarge
         spacing: Theme.paddingMedium
         visible: coverPage.authenticated
         Row {
@@ -165,16 +167,45 @@ CoverBackground {
                 anchors.verticalCenter: unreadChatsCountText.verticalCenter
             }
         }
-
-        Text {
-            id: connectionStateText
-            font.pixelSize: Theme.fontSizeLarge
-            color: Theme.highlightColor
-            visible: coverPage.authenticated
-            width: parent.width
-            maximumLineCount: 3
-            wrapMode: Text.Wrap
-        }
     }
 
+    Text {
+        id: connectionStateText
+        anchors.centerIn: parent
+        font.pixelSize: Theme.fontSizeLarge
+        color: Theme.highlightColor
+        visible: coverPage.authenticated
+        maximumLineCount: 3
+        wrapMode: Text.Wrap
+    }
+
+    Column {
+        anchors.bottom: parent.bottom
+        x: Theme.paddingLarge
+        bottomPadding: Theme.paddingLarge
+        width: parent.width - Theme.paddingLarge
+        spacing: Theme.paddingMedium
+        visible: coverPage.authenticated
+        Row {
+            width: parent.width
+            spacing: Theme.paddingMedium
+            visible: !appSettings.showMutedUnread
+            Text {
+                id: mutedMessagesCountText
+                font.pixelSize: Theme.fontSizeHuge
+                color: Theme.secondaryColor
+                text: Functions.getShortenedCount(coverPage.totalMessages - coverPage.unreadMessages)
+            }
+            Label {
+                id: mutedMessagesText
+                font.pixelSize: Theme.fontSizeExtraSmall
+                width: parent.width - mutedMessagesCountText.width - Theme.paddingMedium
+                wrapMode: Text.Wrap
+                anchors.verticalCenter: mutedMessagesCountText.verticalCenter
+                maximumLineCount: 2
+                truncationMode: TruncationMode.Fade
+                color: Theme.secondaryColor
+            }
+        }
+    }
 }
