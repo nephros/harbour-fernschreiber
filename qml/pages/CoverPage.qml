@@ -79,7 +79,7 @@ CoverBackground {
             setUnreadInfoText();
         }
         onUnreadChatCountUpdated: {
-            coverPage.unreadChats = appSettings.showMutedUnread ? chatCountInformation.unread_count : chatCountInformation.unread_umnuted_count;
+            coverPage.unreadChats = appSettings.showMutedUnread ? chatCountInformation.unread_count : chatCountInformation.unread_unmuted_count;
             setUnreadInfoText();
         }
         onAuthorizationStateChanged: {
