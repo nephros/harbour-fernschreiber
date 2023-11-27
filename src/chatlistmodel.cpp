@@ -70,6 +70,7 @@ public:
     int unreadCount() const;
     int unreadMentionCount() const;
     int unreadReactionCount() const;
+    bool isMuted() const;
     QVariant photoSmall() const;
     qlonglong lastReadInboxMessageId() const;
     qlonglong senderUserId() const;
@@ -171,6 +172,11 @@ int ChatListModel::ChatData::unreadMentionCount() const
 int ChatListModel::ChatData::unreadReactionCount() const
 {
     return chatData.value(UNREAD_REACTION_COUNT).toInt();
+}
+
+bool ChatListModel::ChatData::isMuted() const
+{
+    return chatData.value(NOTIFICATION_SETTINGS).toMap().value("muted_for").toInt() > 0;
 }
 
 QVariant ChatListModel::ChatData::photoSmall() const
