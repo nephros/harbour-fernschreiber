@@ -576,10 +576,13 @@ void ChatListModel::calculateUnreadState()
         LOG("Online-only mode: Calculating unread state on my own...");
         int unreadMessages = 0;
         int unreadChats = 0;
+        bool wantMuted = this->appSettings->showMutedUnread();
         QListIterator<ChatData*> chatIterator(this->chatList);
         while (chatIterator.hasNext()) {
             ChatData *currentChat = chatIterator.next();
             int unreadCount = currentChat->unreadCount();
+            bool muted = currentChat->isMuted();
+            if (muted && !wantMuted) { continue; } // skip
             if (unreadCount > 0) {
                 unreadChats++;
                 unreadMessages += unreadCount;
