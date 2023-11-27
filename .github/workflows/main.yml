@@ -76,28 +76,28 @@ jobs:
         name: rpm-build-result
         path: RPMS
 
-    - name: Create release
-      if: contains(github.ref, 'v')
-      run: |
-        set -x
-        assets=()
-        for asset in RPMS/*.rpm; do
-          assets+=("-a" "$asset")
-        done
-        tag_name="${GITHUB_REF##*/}"
-        hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Create prerelease
-      if: contains(github.ref, 'pre')
-      run: |
-        set -x
-        assets=()
-        for asset in RPMS/*.rpm; do
-          assets+=("-a" "$asset")
-        done
-        tag_name="${GITHUB_REF##*/}"
-        hub release create -p "${assets[@]}" -m "$tag_name" -m "This is a pre-release for testing purposes only. It may or may not be unstable." -m "Join the Telegram group to help out: https://github.com/Wunderfitz/harbour-fernschreiber/issues/162" "$tag_name"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    - name: Create release
+#      if: contains(github.ref, 'v')
+#      run: |
+#        set -x
+#        assets=()
+#        for asset in RPMS/*.rpm; do
+#          assets+=("-a" "$asset")
+#        done
+#        tag_name="${GITHUB_REF##*/}"
+#        hub release create "${assets[@]}" -m "$tag_name" "$tag_name"
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        
+#    - name: Create prerelease
+#      if: contains(github.ref, 'pre')
+#      run: |
+#        set -x
+#        assets=()
+#        for asset in RPMS/*.rpm; do
+#          assets+=("-a" "$asset")
+#        done
+#        tag_name="${GITHUB_REF##*/}"
+#        hub release create -p "${assets[@]}" -m "$tag_name" -m "This is a pre-release for testing purposes only. It may or may not be unstable." -m "Join the Telegram group to help out: https://github.com/Wunderfitz/harbour-fernschreiber/issues/162" "$tag_name"
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
