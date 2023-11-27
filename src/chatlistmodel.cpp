@@ -588,7 +588,10 @@ void ChatListModel::calculateUnreadState()
             ChatData *currentChat = chatIterator.next();
             int unreadCount = currentChat->unreadCount();
             bool muted = currentChat->isMuted();
-            if (muted && !wantMuted) { continue; } // skip
+            if (muted && !wantMuted) { // skip
+                LOG("Online-only mode: Skipping, " << unreadCount << " messages, as chat is muted...");
+                continue;
+            }
             if (unreadCount > 0) {
                 unreadChats++;
                 unreadMessages += unreadCount;
